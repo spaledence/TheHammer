@@ -22,7 +22,7 @@ let config = {
             
         }
     },
-    scene: [Play]
+    scene: [ Menu, Play, Gameover]
 }
 
 
