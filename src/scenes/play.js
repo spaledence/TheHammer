@@ -9,7 +9,7 @@ class Play extends Phaser.Scene {
 
     preload() {
         //add assets
-        this.load.path = './assets/'
+        this.load.path = '/assets/'
         this.load.image('background', 'imgs/bg2.png')
         this.load.image('life', 'imgs/playerlife.png')
         this.load.image('chair', 'imgs/chair.png')
