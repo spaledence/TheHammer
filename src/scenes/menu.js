@@ -12,7 +12,7 @@ class Menu extends Phaser.Scene{
         this.load.bitmapFont('pixelfont', '/assets/text/pixelfont.png', '/assets/text/pixelfont.xml')
         this.load.bitmapFont('retro', '/assets/text/retro.png', '/assets/text/retro.xml')
 
-        this.load.image('background', '/assets/imgs/temp2background.jpeg')
+        this.load.image('background', '/assets/imgs/bg2.png')
 
 
 
@@ -27,7 +27,7 @@ class Menu extends Phaser.Scene{
         if (!this.sound.get('music')) {
             this.backgroundMusic = this.sound.add('music', { loop: true });
             this.backgroundMusic.play();
-            this.backgroundMusic.setVolume(.5)
+            this.backgroundMusic.setVolume(.01)
         }
         
 
@@ -63,6 +63,8 @@ class Menu extends Phaser.Scene{
         this.add.bitmapText(game.config.width/2, game.config.height/2 - 32, 'retro', 'Nobody Beats the Hammer', 32).setOrigin(0.5)
         this.add.bitmapText(game.config.width/2, game.config.height/2 + 64, 'retro', 'Press [Space] to start' , 18).setOrigin(0.5)
         this.add.bitmapText(game.config.width/2, game.config.height/2 + 64, 'retro', 'Press [Space] to start' , 18).setOrigin(0.5)
+        this.add.bitmapText(game.config.width/2, game.config.height/2 + 96, 'retro', 'Press [F] to Punch ' , 18).setOrigin(0.5)
+        this.add.bitmapText(game.config.width/2, game.config.height/2 + 128, 'retro', 'Arrow keys to move' , 18).setOrigin(0.5)
 
 
 

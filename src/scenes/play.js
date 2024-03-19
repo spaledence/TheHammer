@@ -3,26 +3,36 @@ class Play extends Phaser.Scene {
         super('playScene')
         this.lastPunchTime = 0;
         this.isPunching = false;
+        this.currentFrameIndex = 0;
     }
 
     preload() {
         //add assets
         this.load.path = './assets/'
-        this.load.image('background', 'imgs/temp2background.jpeg')
+        this.load.image('background', 'imgs/bg2.png')
         this.load.image('life', 'imgs/playerlife.png')
+        this.load.image('chair', 'imgs/chair.png')
 
         this.load.atlas('playerRun', 'imgs/playerrun.png', 'imgs/playerrun.json')
-        this.load.atlas('hammer', 'imgs/hammer.png', 'imgs/hammer.json')
         this.load.atlas('playeridle', 'imgs/playeridle.png', 'imgs/playeridle.json')
         this.load.atlas('playerpunch', 'imgs/playerpunch.png', 'imgs/playerpunch.json')
         this.load.atlas('hammeridle', 'imgs/hammeridle.png', 'imgs/hammeridle.json')
         this.load.atlas('hammerpunch', 'imgs/hammerpunch.png', 'imgs/hammerpunch.json')
         this.load.atlas('hammerwalk', 'imgs/hammerwalk.png', 'imgs/hammerwalk.json')
+        this.load.atlas('dead', 'imgs/dead.png', 'imgs/dead.json')
+
 
         this.load.bitmapFont('retro', '/text/retro.png', '/text/retro.xml')
 
         this.load.audio('hammerhit', '/sounds/hammerhit.wav')
         this.load.audio('playerhit', '/sounds/playerhit.wav')
+
+        
+
+        this.load.atlas('chairwalk', 'imgs/chairwalk.png', 'imgs/chairwalk.json')
+        this.load.atlas('chairidle', 'imgs/chairidle.png', 'imgs/chairidle.json')
+        this.load.atlas('chairhit', 'imgs/chairhit.png', 'imgs/chairhit.json')
+
 
 
 
@@ -32,20 +42,125 @@ class Play extends Phaser.Scene {
 
     create(){
 
-        this.background = this.add.tileSprite(0, 0, 0, 0, 'background').setOrigin(0)
+        this.punch1 = true;
+
+        this.background = this.add.image(0, 0, 'background').setOrigin(0).setScale(.5)
         this.life1 = this.add.image(50, 50, 'life').setScale(2)
         this.life2 = this.add.image(100, 50, 'life').setScale(2)
         this.life3 = this.add.image(150, 50, 'life').setScale(2)
+       
+        let chairs = []
+        //make chairs
+        this.chair1 = this.physics.add.staticSprite(200, 250, 'chair').setSize(60, 60).setScale(3)
+        this.chair1.body.setOffset(0,70)
+        
+
+        this.chair2 = this.physics.add.staticSprite(100, 500, 'chair').setSize(60, 60).setScale(3)
+        this.chair2.body.setOffset(0,70)
+
+        this.chair3 = this.physics.add.staticSprite(800, 250, 'chair').setSize(60, 60).setScale(3)
+        this.chair3.flipX = true;
+        this.chair3.body.setOffset(0,70)
+
+        this.chair4 = this.physics.add.staticSprite(900, 500, 'chair').setSize(60, 60).setScale(3)
+        this.chair4.flipX = true;
+
+        this.chair4.body.setOffset(0,70)
+
+        chairs.push(this.chair1);
+        chairs.push(this.chair2);
+        chairs.push(this.chair3);
+        chairs.push(this.chair4);
 
         this.hammerHP = 100;
 
         this.hpText = this.add.bitmapText(game.config.width - 200, game.config.height / 8 - 30, 'retro', this.hammerHP, 30).setOrigin(0.5)
 
 
+       
+      
+        
+        
+        document.addEventListener('mousemove', function(event) {
+            console.clear(); // Clear the console for cleaner output
+            //console.log(`Cursor position: X=${event.clientX}, Y=${event.clientY}`);
+        });
+        
+
+        
+        let points = [
+            { x: 10, y:618 },
+            { x: 170, y: 302 },
+            { x: 160, y: 302 },
+            { x: 0, y: 618 }
+
+            //-50, 470, 75, 150
+
+        ];
+        
+        // Create a graphics object to draw the diagonal shape
+        let graphics = this.add.graphics();
+        graphics.fillStyle(0x000000);
+        graphics.fillPoints(points, true);
+        
+        // Create a physics body for the game object using the diagonal shape
+        this.physics.add.existing(graphics);
+        
+
+        
+
 
         //this.background.setScale(3)
 
+
+        //chair anims
+        this.anims.create({
+            key: 'chairwalk',
+            frames: this.anims.generateFrameNames('chairwalk', {
+                prefix: 'chairwalk',  // Prefix for each frame name in the atlas
+                start: 1,                  
+                end: 4,                   
+            }),
+            frameRate: 5,             
+            repeat: -1                
+        });
+
+        this.anims.create({
+            key: 'chairidle',
+            frames: this.anims.generateFrameNames('chairidle', {
+                prefix: 'chairidle',  // Prefix for each frame name in the atlas
+                start: 1,                  
+                end: 2,                   
+            }),
+            frameRate: 3,             
+            repeat: -1                
+        });
+
+        this.anims.create({
+            key: 'chairhit',
+            frames: this.anims.generateFrameNames('chairhit', {
+                prefix: 'chairhit',  // Prefix for each frame name in the atlas
+                start: 1,                  
+                end: 2,                   
+            }),
+            frameRate: 2,             
+            repeat: 0               
+        });
+
+
+
         //player anims
+
+        this.anims.create({
+            key: 'dead',
+            frames: this.anims.generateFrameNames('dead', {
+                prefix: 'dead',  // Prefix for each frame name in the atlas
+                start: 1,                  
+                end: 3,                   
+            }),
+            frameRate: 5,             
+            repeat: 0                
+        });
 
         this.anims.create({
             key: 'playerRun',
@@ -120,23 +235,64 @@ class Play extends Phaser.Scene {
         
         this.hammer = new Hammer(this, 420, 420, 'hammeridle').setOrigin(0).setScale(3).play('hammeridle')
         this.player = new Player(this, 50, 420, 'playeridle').setOrigin(0).setScale(3).play('playeridle')
+        this.invisibleBody = this.physics.add.sprite(440, 475).setSize(100, 60).setOrigin(0)
+        this.invisibleBody2 = this.physics.add.sprite(440, 475).setSize(60, 30).setOrigin(0)
+
         
+        
+
         //.play('player')
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.FKey = this.input.keyboard.addKey('F');
+        this.EKey = this.input.keyboard.addKey('E');
 
 
         this.hammerCanMove = true;
+        let playerHit = false;
+
+
+        //this.isRespawning = false;
 
         //this.physics.add.collider(this.player, this.hammer)
+        this.chairHolding = false;
 
+        /*
+        this.physics.add.overlap(this.player, chairs, () => {
+            if (this.EKey.isDown){
+                this.chairHolding = true;
+                
+            }
 
-        this.physics.add.overlap(this.player, this.hammer, () => {
-            if (this.hammer.anims.currentAnim.key === 'hammerpunch' && this.hammer.anims.currentFrame.index === 2) {
-                // Reset player's position
-                this.player.setPosition(50, 420);
-                this.hammer.setPosition(420, 420)
+        });
+        */
+
+        this.physics.add.overlap(this.player, this.invisibleBody, () => {
+            if (this.hammer.anims.currentAnim.key === 'hammerpunch' && this.hammer.anims.currentFrame.index === 2 && !playerHit) {
+                //this.player.anims.stop()
+                //this.player.anims.play('dead', true).once('animationcomplete', () => {
+                    /*
+                    this.time.delayedCall(1000, () => {
+                        this.player.setPosition(50, 420);
+                        this.isRespawning = false; // Reset the respawn flag
+                        */
+                
+                playerHit = true;
+                let boom = this.add.sprite(this.player.x+40, this.player.y+40, 'dead').setOrigin(0, 0).setScale(2);
+                this.player.setVisible(false);
+                boom.anims.play('dead', true)
+                boom.on('animationcomplete', () => {
+                    this.player.setPosition(50,420);
+                    this.player.setVisible(true);
+                    this.hammer.setPosition(420, 420)
+
+                    boom.destroy();
+                    playerHit = false;
+                })
+   
+                    
+                
+                this.invisibleBody.setPosition(this.hammer.x+20, this.hammer.y+75);
                 this.sound.play('hammerhit')
                 if (this.life3.visible == true){
                     this.life3.visible = false
@@ -148,13 +304,58 @@ class Play extends Phaser.Scene {
                     this.life1.visible = false
                     this.scene.start("gameoverScene")
                 }
-                
-
-                
             }
+
+        });
+
+        let collisionBoxes = [];
+
+        // Add all collision boxes to the array
+        collisionBoxes.push(this.physics.add.staticSprite(500, 640).setSize(900, 50).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(500, 200).setSize(640, 50).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(-15, 300).setSize(50, 500).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(0, 300).setSize(50, 450).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(15, 300).setSize(50, 400).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(30, 300).setSize(50, 350).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(45, 300).setSize(50, 300).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(60, 300).setSize(50, 250).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(75, 300).setSize(50, 200).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(90, 300).setSize(50, 150).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(105, 300).setSize(50, 100).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(120, 280).setSize(50, 50).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(140, 230).setSize(30, 30).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(150, 220).setSize(30, 30).setOrigin(0));
+
+
+        collisionBoxes.push(this.physics.add.staticSprite(970, 320).setSize(30, 450).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(960, 320).setSize(30, 400).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(950, 320).setSize(30, 350).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(940, 320).setSize(30, 300).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(930, 320).setSize(30, 250).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(920, 320).setSize(30, 150).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(910, 320).setSize(30, 100).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(900, 320).setSize(30, 50).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(880, 230).setSize(30, 30).setOrigin(0));
+        collisionBoxes.push(this.physics.add.staticSprite(860, 220).setSize(30, 30).setOrigin(0));
+
+
+
+        // Add a collider between the player and the group of collision boxes
+        this.physics.add.collider(this.player, collisionBoxes, () => {
+            //console.log("Collision with one of the collision boxes detected!");
+        });
+
+
+        
+
+        this.physics.add.collider(this.player, this.graphics)
+
+ 
+        this.physics.add.overlap(this.invisibleBody2, this.hammer, () => {
             if (this.player.anims.currentAnim.key === 'playerpunch' && !this.hitRegistered){
                 this.hammerHP--;
-                console.log(this.hammerHP);
+                //console.log(this.hammerHP);
+
                 this.sound.play('playerhit')
                 this.hitRegistered = true; // Set the flag to true to indicate the hit has been registered
             }
@@ -165,16 +366,37 @@ class Play extends Phaser.Scene {
             }
         });
         
+        
 
-        //let moveDirection = new Phaser.Math.Vector2(0, 0)
-
-        //var facingLeft = true;
 
     }
 
     update(){
 
         this.hpText.setText('Hammer Health: ' + this.hammerHP);
+
+        if (this.hammer.anims.currentAnim.key === 'hammerpunch') {
+            // If the physics sprite has not been created yet, create it
+            if (this.hammer.flipX == false){
+                this.invisibleBody.setPosition(this.hammer.x+30, this.hammer.y+75);
+                this.physicsSpriteCreated = true;
+            }
+            else{
+                this.invisibleBody.setPosition(this.hammer.x+130, this.hammer.y+75);
+                this.physicsSpriteCreated = true;
+            }
+            
+
+        // If the physics sprite has been created, destroy it and reset the flag
+            if (this.physicsSpriteCreated) {
+                //this.invisibleBody.destroy();
+                this.physicsSpriteCreated = false;
+            }
+        }
+
+
+        
+
 
         //gameover
         if (this.hammerHP == 0){
@@ -184,20 +406,20 @@ class Play extends Phaser.Scene {
         let velocityX = 0;
         let velocityY = 0;
 
-        if (this.cursors.right.isDown) {
+        if (this.cursors.right.isDown && !this.FKey.isDown) {
             velocityX += 1;
             this.player.flipX = true;
             this.player.anims.play('playerRun', true);
-        } else if (this.cursors.left.isDown) {
+        } else if (this.cursors.left.isDown && !this.FKey.isDown) {
             velocityX -= 1;
             this.player.flipX = false;
             this.player.anims.play('playerRun', true);
         }
 
-        if (this.cursors.down.isDown) {
+        if (this.cursors.down.isDown && !this.FKey.isDown) {
             velocityY += 1;
             this.player.anims.play('playerRun', true);
-        } else if (this.cursors.up.isDown) {
+        } else if (this.cursors.up.isDown && !this.FKey.isDown) {
             velocityY -= 1;
             this.player.anims.play('playerRun', true);
         }
@@ -207,6 +429,7 @@ class Play extends Phaser.Scene {
             const totalVelocity = new Phaser.Math.Vector2(velocityX, velocityY).normalize().scale(speed);
 
             this.player.body.setVelocity(totalVelocity.x, totalVelocity.y);
+            //this.invisibleBody.body.setVelocity(totalVelocity.x, totalVelocity.y)
         } else {
             this.player.body.setVelocity(0, 0);
             if (this.FKey.isDown != true){
@@ -214,52 +437,109 @@ class Play extends Phaser.Scene {
             }
         }
         
-        if (this.FKey.isDown ) {
-            //const currentTime = this.time.now;
-            this.player.body.setVelocity(0, 0);
-            this.player.anims.play('playerpunch', true);
+        /*
+        var Punched = false
+
+        if (this.FKey.isDown && Punched == true){
+            this.player.anims.currentFrame.index = 2
+            
+        }
+        else if (this.FKey.isDown && Punched == false){
+
+        }
+        */
+
+        if (this.FKey.isDown && !this.prevFKeyState) {
+            this.prevFKeyState = true;
+            // Play punch animation based on the current frame
+            if (this.punch1) {
+                this.player.anims.play('playerpunch', true).setFrame('playerpunch1');
+            } 
+            else {
+                this.player.anims.play('playerpunch', true).setFrame('playerpunch2');
+            }
+            this.punch1 = !this.punch1; // Toggle punch1 
+            this.invisibleBody2.setPosition(this.player.x+20, this.player.y+75);
+
+            if (this.player.flipX) {
+                // Player is facing right, spawn to the right
+                this.invisibleBody2.setPosition(this.player.x + 120, this.player.y + 110 );
+            } else {
+                // Player is facing left, spawn to the left
+                this.invisibleBody2.setPosition(this.player.x + 40, this.player.y + 110);
+            }
 
             
+            this.player.anims.pause();
+                this.time.delayedCall(10000, () => {
+                    this.player.anims.resume();
+                });
+            
+        }
+
+        else if (!this.FKey.isDown) {
+            this.prevFKeyState = false; // Reset previous F key state
         }
 
         if (this.hammerCanMove == true) {
             const directionX = this.player.x - this.hammer.x;
             const directionY = this.player.y - this.hammer.y;
             const distance = Math.sqrt(directionX * directionX + directionY * directionY);
-            //console.log(distance)
+            const requiredDistanceX = 90; // Adjust as needed
+            const requiredDistanceY = 10; // Adjust as needed
         
-            // Normalize the direction vector
-            const normalizedDirectionX = directionX / distance;
-            const normalizedDirectionY = directionY / distance;
+            // Calculate the distance differences
+            const distanceDiffX = Math.abs(directionX) - requiredDistanceX;
+            const distanceDiffY = Math.abs(directionY) - requiredDistanceY;
         
-            //later, i should adjust the movement of the hammer to scale based on how far away he is from the players x, y
-            // Move the hammer towards the player at a speed of 50, but only if it is more than 120 pixels away
-            if (Math.abs(directionX) > 110 || Math.abs(directionY) > 20) {
+            // Calculate the proportional speed
+            const speedX = (distanceDiffX > 0) ? Math.sign(directionX) * Math.min(Math.abs(distanceDiffX), 50) : 0;
+            const speedY = (distanceDiffY > 0) ? Math.sign(directionY) * Math.min(Math.abs(distanceDiffY), 50) : 0;
+        
+            // Move the hammer
+            this.hammer.body.setVelocity(speedX, speedY);
+        
+            // Update hammer direction
+            if (this.hammer.x < this.player.x) {
+                this.hammer.flipX = true;
+            } else if (this.hammer.x > this.player.x) {
+                this.hammer.flipX = false;
+            }
+        
+            // Check if the hammer is close enough to trigger the punch animation
+            if (Math.abs(directionX) <= 110 && Math.abs(directionY) <= 24) {
+                this.hammer.body.setVelocity(0, 0);
+                this.hammer.anims.play('hammerpunch', true);
+                this.hammerCanMove = false;
+        
+                this.time.delayedCall(2000, () => {
+                    this.hammerCanMove = true;
+                    this.hammer.body.setSize(this.hammer.width / 1.5, this.hammer.height / 1.5);
+                });
+            } 
+            else if (Math.abs(directionX) <= 140 && Math.abs(directionY) <= 60 && (this.hammer.y) <= -20){
+                this.hammer.body.setVelocity(0, 0)
+                this.hammer.anims.play('hammerpunch', true);
+                this.hammerCanMove = false;
+        
+                this.time.delayedCall(2000, () => {
+                    this.hammerCanMove = true;
+                    this.hammer.body.setSize(this.hammer.width / 1.5, this.hammer.height / 1.5);
+                });
+            } 
+                
+            else {
+                // Play walk animation if not close enough for punch animation
+                this.hammer.anims.play('hammerwalk', true);
+                //console.log(this.player.x, this.player.y)
+                //console.log(this.hammer.y)
                 //console.log(Math.abs(directionX))
                 //console.log(Math.abs(directionY))
-                this.hammer.body.setVelocity(normalizedDirectionX * 50, normalizedDirectionY * 50);
-                this.hammer.anims.play('hammerwalk', true)
-                if (this.hammer.x < this.player.x ){
-                    this.hammer.flipX = true;
-                }
-                else{
-                    this.hammer.flipX = false;
-                }
-            } else {
-                this.hammer.body.setVelocity(0, 0);
-                this.hammer.anims.play('hammerpunch', true)
-                this.hammer.body.setSize(this.hammer.width, this.hammer.height/1.5)
-                this.hammerCanMove = false;
+                //console.log(this.hammer.body.velocityX)
+                //console.log(this.hammer.body.velocityY)
 
-                
-                
-                this.time.delayedCall(3000, () => {
-                    this.hammerCanMove = true;
-                    this.hammer.body.setSize(this.hammer.width/1.5, this.hammer.height/1.5)
 
-                });
 
-                
             }
         }
         
