@@ -1,3 +1,7 @@
+//Dale Spence - Nobody Beats the Hammer 
+//3/18/2024
+//Phaser Components Included: Animation Manager, Text Objects, Timers, Physics Systems, Couldnt think of others 
+
 'use strict';
 
 // define and configure main Phaser game object

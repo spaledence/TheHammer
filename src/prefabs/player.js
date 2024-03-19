@@ -5,7 +5,7 @@ class Player extends Phaser.GameObjects.Sprite {
         scene.physics.add.existing(this);
         //this.body.setImmovable(true)
         this.body.setSize(this.width/2.5, this.height/2.5)
-        this.body.setOffset(20, 30)
+        this.body.setOffset(20, 25)
         this.body.setCollideWorldBounds(true)
     }
 
@@ -13,27 +13,6 @@ class Player extends Phaser.GameObjects.Sprite {
 
     }
 
-    runRight(){
-        this.body.setVelocityX(50);
-
-    }
-
-    runLeft(){
-        this.body.setVelocityX(-50);
-
-    }
-
-    runUp(){
-        this.body.setVelocityY(50);
-
-
-    }
-
-    runDown(){
-        this.body.setVelocityY(50);
-
-
-    }
 
 
 }

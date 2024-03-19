@@ -12,13 +12,21 @@ class Gameover extends Phaser.Scene{
 
     create(){
 
-        //let score = data.score
+        this.hammerHP = this.scene.settings.data.hammerHP;
 
         this.cursors = this.input.keyboard.createCursorKeys();
         this.spacebar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         this.restart = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.R);
 
-        this.add.bitmapText(game.config.width/2, game.config.height/2 - 32, 'retro', 'Game Over', 32).setOrigin(.5)
+        if (this.hammerHP > 0){
+            this.add.bitmapText(game.config.width/2, game.config.height/2 - 32, 'retro', 'Game Over', 32).setOrigin(.5)
+            this.add.bitmapText(game.config.width / 2, game.config.height / 2, 'retro', `The Hammer had: ${this.hammerHP} HP left`, 16).setOrigin(0.5);
+
+        }
+        else{
+            this.add.bitmapText(game.config.width/2, game.config.height/2 - 32, 'retro', 'You Win!', 32).setOrigin(.5)
+
+        }
 
         this.add.bitmapText(game.config.width/2, game.config.height/2 + 64, 'retro', 'Press [Space] for Menu', 16).setOrigin(.5)
         this.add.bitmapText(game.config.width/2, game.config.height/2 + 96, 'retro', 'Press [R] to Restart', 16).setOrigin(.5)

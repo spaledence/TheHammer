@@ -3,7 +3,8 @@ class Play extends Phaser.Scene {
         super('playScene')
         this.lastPunchTime = 0;
         this.isPunching = false;
-        this.currentFrameIndex = 0;
+        
+
     }
 
     preload() {
@@ -23,6 +24,8 @@ class Play extends Phaser.Scene {
 
 
         this.load.bitmapFont('retro', '/text/retro.png', '/text/retro.xml')
+        this.load.bitmapFont('retro2', '/text/retroYellow.png', '/text/retroYellow.xml')
+
 
         this.load.audio('hammerhit', '/sounds/hammerhit.wav')
         this.load.audio('playerhit', '/sounds/playerhit.wav')
@@ -74,17 +77,12 @@ class Play extends Phaser.Scene {
 
         this.hammerHP = 100;
 
-        this.hpText = this.add.bitmapText(game.config.width - 200, game.config.height / 8 - 30, 'retro', this.hammerHP, 30).setOrigin(0.5)
+
+        this.hpText = this.add.bitmapText(game.config.width - 450, game.config.height / 8 - 30, 'retro2', this.hammerHP, 30).setOrigin(0.5)
 
 
        
       
-        
-        
-        document.addEventListener('mousemove', function(event) {
-            console.clear(); // Clear the console for cleaner output
-            //console.log(`Cursor position: X=${event.clientX}, Y=${event.clientY}`);
-        });
         
 
         
@@ -98,20 +96,6 @@ class Play extends Phaser.Scene {
 
         ];
         
-        // Create a graphics object to draw the diagonal shape
-        let graphics = this.add.graphics();
-        graphics.fillStyle(0x000000);
-        graphics.fillPoints(points, true);
-        
-        // Create a physics body for the game object using the diagonal shape
-        this.physics.add.existing(graphics);
-        
-
-        
-
-
-        //this.background.setScale(3)
-
 
         //chair anims
         this.anims.create({
@@ -143,7 +127,7 @@ class Play extends Phaser.Scene {
                 start: 1,                  
                 end: 2,                   
             }),
-            frameRate: 2,             
+            frameRate: 5,             
             repeat: 0               
         });
 
@@ -233,11 +217,11 @@ class Play extends Phaser.Scene {
 
 
         
-        this.hammer = new Hammer(this, 420, 420, 'hammeridle').setOrigin(0).setScale(3).play('hammeridle')
+        this.hammer = new Hammer(this, 400, 400, 'hammeridle').setOrigin(0).setScale(3).play('hammeridle')
         this.player = new Player(this, 50, 420, 'playeridle').setOrigin(0).setScale(3).play('playeridle')
         this.invisibleBody = this.physics.add.sprite(440, 475).setSize(100, 60).setOrigin(0)
         this.invisibleBody2 = this.physics.add.sprite(440, 475).setSize(60, 30).setOrigin(0)
-
+        this.invisibleBody3 = this.physics.add.sprite(440, 475).setSize(80, 100).setOrigin(0)
         
         
 
@@ -257,15 +241,17 @@ class Play extends Phaser.Scene {
         //this.physics.add.collider(this.player, this.hammer)
         this.chairHolding = false;
 
-        /*
-        this.physics.add.overlap(this.player, chairs, () => {
+        
+        this.physics.add.overlap(this.player, chairs, (player, chair) => {
             if (this.EKey.isDown){
                 this.chairHolding = true;
-                
+                this.player.anims.play('chairidle', true);
+                chair.destroy()
             }
 
+
         });
-        */
+        
 
         this.physics.add.overlap(this.player, this.invisibleBody, () => {
             if (this.hammer.anims.currentAnim.key === 'hammerpunch' && this.hammer.anims.currentFrame.index === 2 && !playerHit) {
@@ -282,9 +268,16 @@ class Play extends Phaser.Scene {
                 this.player.setVisible(false);
                 boom.anims.play('dead', true)
                 boom.on('animationcomplete', () => {
-                    this.player.setPosition(50,420);
+                    if (this.player.x >= this.hammer.x){
+                        this.player.setPosition(50,420);
+                    }
+                    else{
+                        this.player.setPosition(750,420);
+
+                    }
+                    this.chairHolding = false;
                     this.player.setVisible(true);
-                    this.hammer.setPosition(420, 420)
+                    this.hammer.setPosition(400, 400)
 
                     boom.destroy();
                     playerHit = false;
@@ -302,7 +295,7 @@ class Play extends Phaser.Scene {
                 }
                 else if(this.life1.visible == true){
                     this.life1.visible = false
-                    this.scene.start("gameoverScene")
+                    this.scene.start('gameoverScene', { hammerHP: this.hammerHP });
                 }
             }
 
@@ -350,12 +343,11 @@ class Play extends Phaser.Scene {
 
         this.physics.add.collider(this.player, this.graphics)
 
- 
+        //this.hitRegistered = false;
         this.physics.add.overlap(this.invisibleBody2, this.hammer, () => {
             if (this.player.anims.currentAnim.key === 'playerpunch' && !this.hitRegistered){
                 this.hammerHP--;
                 //console.log(this.hammerHP);
-
                 this.sound.play('playerhit')
                 this.hitRegistered = true; // Set the flag to true to indicate the hit has been registered
             }
@@ -364,6 +356,21 @@ class Play extends Phaser.Scene {
             if (this.player.anims.currentAnim.key !== 'playerpunch' && this.hitRegistered){
                 this.hitRegistered = false;
             }
+        });
+
+        this.physics.add.overlap(this.invisibleBody3, this.hammer, () => {
+            if(this.player.anims.currentAnim.key === 'chairhit'  && this.player.anims.currentFrame.index === 2 && !this.hitRegistered2){
+                this.hammerHP -= 25;
+                this.sound.play('hammerhit');
+                this.hitRegistered2 = true;
+                this.time.delayedCall(500, () => {
+                    this.chairHolding = false;
+                });
+            }
+            if (this.player.anims.currentAnim.key !== 'chairhit'  && this.hitRegistered2){
+                this.hitRegistered2 = false;
+            }
+
         });
         
         
@@ -399,27 +406,67 @@ class Play extends Phaser.Scene {
 
 
         //gameover
-        if (this.hammerHP == 0){
-            this.scene.start('gameoverScene')
+        if (this.hammerHP <= 0){
+            this.scene.start('gameoverScene', { hammerHP: this.hammerHP });
+
         }
 
         let velocityX = 0;
         let velocityY = 0;
 
-        if (this.cursors.right.isDown && !this.FKey.isDown) {
+        
+        /////////
+        //chairwalk
+        ///////////
+        if (this.cursors.right.isDown && !this.FKey.isDown && this.chairHolding) {
+            velocityX += 1;
+            this.player.flipX = true;
+            this.player.anims.play('chairwalk', true);
+        } else if (this.cursors.left.isDown && !this.FKey.isDown && this.chairHolding) {
+            velocityX -= 1;
+            this.player.flipX = false;
+            this.player.anims.play('chairwalk', true);
+        }
+
+        if (this.cursors.down.isDown && !this.FKey.isDown && this.chairHolding) {
+            velocityY += 1;
+            this.player.anims.play('chairwalk', true);
+        } else if (this.cursors.up.isDown && !this.FKey.isDown && this.chairHolding) {
+            velocityY -= 1;
+            this.player.anims.play('chairwalk', true);
+        }
+
+        if (velocityX !== 0 || velocityY !== 0) {
+            const speed = 100; // Adjust the speed as needed
+            const totalVelocity = new Phaser.Math.Vector2(velocityX, velocityY).normalize().scale(speed);
+
+            this.player.body.setVelocity(totalVelocity.x, totalVelocity.y);
+            //this.invisibleBody.body.setVelocity(totalVelocity.x, totalVelocity.y)
+        } else {
+            this.player.body.setVelocity(0, 0);
+            if (this.FKey.isDown != true && this.chairHolding){
+                this.player.anims.play('chairidle', true);
+            }
+        }
+
+
+        /////////
+        //normal walk
+        ////////
+        if (this.cursors.right.isDown && !this.FKey.isDown && !this.chairHolding) {
             velocityX += 1;
             this.player.flipX = true;
             this.player.anims.play('playerRun', true);
-        } else if (this.cursors.left.isDown && !this.FKey.isDown) {
+        } else if (this.cursors.left.isDown && !this.FKey.isDown && !this.chairHolding) {
             velocityX -= 1;
             this.player.flipX = false;
             this.player.anims.play('playerRun', true);
         }
 
-        if (this.cursors.down.isDown && !this.FKey.isDown) {
+        if (this.cursors.down.isDown && !this.FKey.isDown && !this.chairHolding) {
             velocityY += 1;
             this.player.anims.play('playerRun', true);
-        } else if (this.cursors.up.isDown && !this.FKey.isDown) {
+        } else if (this.cursors.up.isDown && !this.FKey.isDown && !this.chairHolding) {
             velocityY -= 1;
             this.player.anims.play('playerRun', true);
         }
@@ -432,53 +479,68 @@ class Play extends Phaser.Scene {
             //this.invisibleBody.body.setVelocity(totalVelocity.x, totalVelocity.y)
         } else {
             this.player.body.setVelocity(0, 0);
-            if (this.FKey.isDown != true){
+            if (this.FKey.isDown != true && !this.chairHolding){
                 this.player.anims.play('playeridle', true);
             }
         }
         
-        /*
-        var Punched = false
+        
 
-        if (this.FKey.isDown && Punched == true){
-            this.player.anims.currentFrame.index = 2
+
+        if (this.FKey.isDown && this.chairHolding && !this.prevFkeyState2 && !this.playerIsHittingWithChair) {
+            // Set the flag to true to prevent multiple chair hits
+            this.playerIsHittingWithChair = true;
+            this.prevFKeyState2 = true;
+            // Play the chair hit animation
+            this.player.anims.play('chairhit', true);
+
+            // Set the position of the invisible body
+            if (this.player.flipX) {
+                this.invisibleBody3.setPosition(this.player.x + 120, this.player.y + 110);
+            } else {
+                this.invisibleBody3.setPosition(this.player.x + 40, this.player.y + 110);
+            }
+
+            
+
+            // Optional: Add a delay before resetting the flag to allow the animation to finish
             
         }
-        else if (this.FKey.isDown && Punched == false){
-
+        else if (!this.FKey.isDown) {
+            this.prevFKeyState2 = false; // Reset previous F key state
+            this.playerIsHittingWithChair = false; // Reset playerIsPunching when the F key is released
         }
-        */
 
-        if (this.FKey.isDown && !this.prevFKeyState) {
+        
+
+        
+
+        if (this.FKey.isDown && !this.prevFKeyState && !this.chairHolding && !this.playerIsPunching) {
             this.prevFKeyState = true;
+            this.playerIsPunching = true; // Set playerIsPunching to true to prevent multiple punches
             // Play punch animation based on the current frame
             if (this.punch1) {
                 this.player.anims.play('playerpunch', true).setFrame('playerpunch1');
-            } 
-            else {
+            } else {
                 this.player.anims.play('playerpunch', true).setFrame('playerpunch2');
             }
             this.punch1 = !this.punch1; // Toggle punch1 
-            this.invisibleBody2.setPosition(this.player.x+20, this.player.y+75);
-
+        
             if (this.player.flipX) {
                 // Player is facing right, spawn to the right
-                this.invisibleBody2.setPosition(this.player.x + 120, this.player.y + 110 );
+                this.invisibleBody2.setPosition(this.player.x + 120, this.player.y + 110);
             } else {
                 // Player is facing left, spawn to the left
                 this.invisibleBody2.setPosition(this.player.x + 40, this.player.y + 110);
             }
-
-            
+        
             this.player.anims.pause();
-                this.time.delayedCall(10000, () => {
-                    this.player.anims.resume();
-                });
-            
-        }
-
-        else if (!this.FKey.isDown) {
+            this.time.delayedCall(10000, () => {
+                this.player.anims.resume();
+            });
+        } else if (!this.FKey.isDown) {
             this.prevFKeyState = false; // Reset previous F key state
+            this.playerIsPunching = false; // Reset playerIsPunching when the F key is released
         }
 
         if (this.hammerCanMove == true) {
@@ -531,12 +593,7 @@ class Play extends Phaser.Scene {
             else {
                 // Play walk animation if not close enough for punch animation
                 this.hammer.anims.play('hammerwalk', true);
-                //console.log(this.player.x, this.player.y)
-                //console.log(this.hammer.y)
-                //console.log(Math.abs(directionX))
-                //console.log(Math.abs(directionY))
-                //console.log(this.hammer.body.velocityX)
-                //console.log(this.hammer.body.velocityY)
+                
 
 
 
