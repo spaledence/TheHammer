@@ -9,7 +9,7 @@ class Play extends Phaser.Scene {
 
     preload() {
         //add assets
-        this.load.path = '/assets/'
+        this.load.path = 'assets/'
         this.load.image('background', 'imgs/bg2.png')
         this.load.image('life', 'imgs/playerlife.png')
         this.load.image('chair', 'imgs/chair.png')
@@ -23,12 +23,12 @@ class Play extends Phaser.Scene {
         this.load.atlas('dead', 'imgs/dead.png', 'imgs/dead.json')
 
 
-        this.load.bitmapFont('retro', '/text/retro.png', '/text/retro.xml')
-        this.load.bitmapFont('retro2', '/text/retroYellow.png', '/text/retroYellow.xml')
+        this.load.bitmapFont('retro', 'text/retro.png', 'text/retro.xml')
+        this.load.bitmapFont('retro2', 'text/retroYellow.png', 'text/retroYellow.xml')
 
 
-        this.load.audio('hammerhit', '/sounds/hammerhit.wav')
-        this.load.audio('playerhit', '/sounds/playerhit.wav')
+        this.load.audio('hammerhit', 'sounds/hammerhit.wav')
+        this.load.audio('playerhit', 'sounds/playerhit.wav')
 
         
 
