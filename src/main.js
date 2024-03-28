@@ -4,7 +4,7 @@
 
 'use strict';
 
-// define and configure main Phaser game object
+// define and configure main Phaser game objec
 let config = {
     parent: 'myGame',
     type: Phaser.AUTO,

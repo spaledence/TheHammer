@@ -9,17 +9,17 @@ class Menu extends Phaser.Scene{
         //this.load.audio('music', 'sounds/music.mp3')
         //this.load.audio('select', 'sounds/Blip_select 4.wav')
 
-        this.load.bitmapFont('pixelfont', '/assets/text/pixelfont.png', '/assets/text/pixelfont.xml')
-        this.load.bitmapFont('retro', '/assets/text/retro.png', '/assets/text/retro.xml')
+        this.load.bitmapFont('pixelfont', 'assets/text/pixelfont.png', '/assets/text/pixelfont.xml')
+        this.load.bitmapFont('retro', 'assets/text/retro.png', '/assets/text/retro.xml')
 
-        this.load.image('background', '/assets/imgs/bg2.png')
+        this.load.image('background', 'assets/imgs/bg2.png')
         
-        this.load.image('hammerHead', '/assets/imgs/hammerHead.png')
-        this.load.image('playerHead', '/assets/imgs/playerlife.png')
+        this.load.image('hammerHead', 'assets/imgs/hammerHead.png')
+        this.load.image('playerHead', 'assets/imgs/playerlife.png')
 
 
         
-        this.load.audio('music', '/assets/sounds/theme.mp3')
+        this.load.audio('music', 'assets/sounds/theme.mp3')
         
 
     }
