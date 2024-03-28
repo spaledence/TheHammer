@@ -9,32 +9,32 @@ class Play extends Phaser.Scene {
 
     preload() {
         //add assets
-        //this.load.path = 'assets/'
-        this.load.image('background', 'assets/imgs/bg2.png')
-        this.load.image('life', 'assets/imgs/playerlife.png')
-        this.load.image('chair', 'assets/imgs/chair.png')
+        this.load.path = 'assets/'
+        this.load.image('background', 'imgs/bg2.png')
+        this.load.image('life', 'imgs/playerlife.png')
+        this.load.image('chair', 'imgs/chair.png')
 
-        this.load.atlas('playerRun', 'assets/imgs/playerrun.png', 'assets/imgs/playerrun.json')
-        this.load.atlas('playeridle', 'assets/imgs/playeridle.png', 'assets/imgs/playeridle.json')
-        this.load.atlas('playerpunch', 'assets/imgs/playerpunch.png', 'assets/imgs/playerpunch.json')
-        this.load.atlas('hammeridle', 'assets/imgs/hammeridle.png', 'assets/imgs/hammeridle.json')
-        this.load.atlas('hammerpunch', 'assets/imgs/hammerpunch.png', 'assets/imgs/hammerpunch.json')
-        this.load.atlas('hammerwalk', 'assets/imgs/hammerwalk.png', 'assets/imgs/hammerwalk.json')
-        this.load.atlas('dead', 'assets/imgs/dead.png', 'assets/imgs/dead.json')
-
-
-        this.load.bitmapFont('retro', 'assets/text/retro.png', 'assets/text/retro.xml')
-        this.load.bitmapFont('retro2', 'assets/text/retroYellow.png', 'assets/text/retroYellow.xml')
+        this.load.atlas('playerRun', 'imgs/playerrun.png', 'imgs/playerrun.json')
+        this.load.atlas('playeridle', 'imgs/playeridle.png', 'imgs/playeridle.json')
+        this.load.atlas('playerpunch', 'imgs/playerpunch.png', 'imgs/playerpunch.json')
+        this.load.atlas('hammeridle', 'imgs/hammeridle.png', 'imgs/hammeridle.json')
+        this.load.atlas('hammerpunch', 'imgs/hammerpunch.png', 'imgs/hammerpunch.json')
+        this.load.atlas('hammerwalk', 'imgs/hammerwalk.png', 'imgs/hammerwalk.json')
+        this.load.atlas('dead', 'imgs/dead.png', 'imgs/dead.json')
 
 
-        this.load.audio('hammerhit', 'assets/sounds/hammerhit.wav')
-        this.load.audio('playerhit', 'assets/sounds/playerhit.wav')
+        this.load.bitmapFont('retro', 'text/retro.png', 'text/retro.xml')
+        this.load.bitmapFont('retro2', 'text/retroYellow.png', 'text/retroYellow.xml')
+
+
+        this.load.audio('hammerhit', 'sounds/hammerhit.wav')
+        this.load.audio('playerhit', 'sounds/playerhit.wav')
 
         
 
-        this.load.atlas('chairwalk', 'assets/imgs/chairwalk.png', 'assets/imgs/chairwalk.json')
-        this.load.atlas('chairidle', 'assets/imgs/chairidle.png', 'assets/imgs/chairidle.json')
-        this.load.atlas('chairhit', 'assets/imgs/chairhit.png', 'assets/imgs/chairhit.json')
+        this.load.atlas('chairwalk', 'imgs/chairwalk.png', 'imgs/chairwalk.json')
+        this.load.atlas('chairidle', 'imgs/chairidle.png', 'imgs/chairidle.json')
+        this.load.atlas('chairhit', 'imgs/chairhit.png', 'imgs/chairhit.json')
 
 
 
